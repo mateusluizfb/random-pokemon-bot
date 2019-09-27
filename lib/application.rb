@@ -38,7 +38,7 @@ module Application
   end
 
   def self.open_image
-    File.open(File.join('..', '..', IMAGE_FILE_NAME), 'r')
+    File.open(File.join(IMAGE_FILE_NAME), 'r')
   end
 
   def self.send_tweet(pokemon_name, pokemon_image_file)
