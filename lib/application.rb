@@ -32,7 +32,7 @@ module Application
   end
 
   def self.download_image(image_url)
-    file = File.open(IMAGE_FILE_NAME, 'r+')
+    file = File.open(IMAGE_FILE_NAME, 'w+')
     file.write open(image_url).read
     file.close
     File.open(IMAGE_FILE_NAME, 'r')
