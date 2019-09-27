@@ -10,8 +10,8 @@ module Application
   def self.generate_pokemon
     div = find_pokemon_info_div
     pokemon_name = pokemon_name(div)
-    pokemon_image_url(div).then { |image_url| download_image(image_url) }
-    pokemon_image_file = open_image
+    image_url = pokemon_image_url(div)
+    pokemon_image_file = download_image(image_url)
     send_tweet(pokemon_name, pokemon_image_file)
   end
 
@@ -32,13 +32,10 @@ module Application
   end
 
   def self.download_image(image_url)
-    file = File.open(IMAGE_FILE_NAME, 'wb')
+    file = File.open(IMAGE_FILE_NAME, 'r+')
     file.write open(image_url).read
-    file
-  end
-
-  def self.open_image
-    File.open(File.join(IMAGE_FILE_NAME), 'r')
+    file.close
+    File.open(IMAGE_FILE_NAME, 'r')
   end
 
   def self.send_tweet(pokemon_name, pokemon_image_file)
