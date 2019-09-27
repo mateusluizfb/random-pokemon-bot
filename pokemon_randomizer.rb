@@ -20,4 +20,4 @@ client = Twitter::REST::Client.new do |config|
   config.access_token_secret = ""
 end
 
-File.open('pokemon_image.png', 'r'){|f| client.update_with_media("Pokemon #{pokemon_name}", f) }
+File.open('pokemon_image.png', 'r'){|f| client.update_with_media("Pokemon of the day: #{pokemon_name}", f) }
