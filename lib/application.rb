@@ -1,23 +1,48 @@
-require "mechanize"
-require "twitter"
-require "open-uri"
+# frozen_string_literal: true
 
-page = Mechanize.new
-       .get('https://pokemon.alexonsager.net/')
-       .search('div#wrapper')
-       .search('div#main')
-       .search('div#fused')
+require 'mechanize'
+require 'twitter'
+require 'open-uri'
 
-pokemon_name = page.search('div.title').search('div#pk_name').children.last.to_s
-pokemon_image_url = page.search('img').last.values.last
+module Application
+  def self.generate_pokemon
+    div = find_pokemon_info_div
+    pokemon_name = pokemon_name(div)
+    image_url = pokemon_image_url(div)
+    pokemon_image_file = download_image(image_url)
+    send_tweet(pokemon_name, pokemon_image_file)
+  end
 
-File.open('pokemon_image.png', 'wb') {|fo| fo.write open(pokemon_image_url).read }
+  def self.find_pokemon_info_div
+    Mechanize.new
+             .get('https://pokemon.alexonsager.net/')
+             .search('div#wrapper')
+             .search('div#main')
+             .search('div#fused')
+  end
 
-client = Twitter::REST::Client.new do |config|
-  config.consumer_key        = ENV['CONSUMER_KEY']
-  config.consumer_secret     = ENV['CONSUMER_SECRET']
-  config.access_token        = ENV['ACCESS_TOKEN']
-  config.access_token_secret = ENV['ACCESS_TOKEN_SECRET']
+  def self.pokemon_name(page)
+    page.search('div.title').search('div#pk_name').children.last.to_s
+  end
+
+  def self.pokemon_image_url(page)
+    page.search('img').last.values.last
+  end
+
+  def self.download_image(image_url)
+    file = File.open('pokemon_image.png', 'wb')
+    file.write open(image_url).read
+    file
+  end
+
+  def self.send_tweet(pokemon_name, pokemon_image_file)
+    client = Twitter::REST::Client.new do |config|
+      config.consumer_key        = ENV['CONSUMER_KEY']
+      config.consumer_secret     = ENV['CONSUMER_SECRET']
+      config.access_token        = ENV['ACCESS_TOKEN']
+      config.access_token_secret = ENV['ACCESS_TOKEN_SECRET']
+    end
+
+    client.update_with_media("Pokemon of the day: #{pokemon_name}", pokemon_image_file)
+  end
 end
-
-File.open('pokemon_image.png', 'r'){|f| client.update_with_media("Pokemon of the day: #{pokemon_name}", f) }
