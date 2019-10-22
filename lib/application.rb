@@ -46,6 +46,6 @@ module Application
       config.access_token_secret = ENV['ACCESS_TOKEN_SECRET']
     end
 
-    client.update_with_media("Pokemon of the day: #{pokemon_name}", pokemon_image_file)
+    client.update_with_media("Pokemon of the day: #{pokemon_name} #pokemon", pokemon_image_file)
   end
 end
